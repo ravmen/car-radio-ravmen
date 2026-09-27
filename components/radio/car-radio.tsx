@@ -7,7 +7,7 @@ import { ColorPicker } from '@/components/radio/color-picker'
 import { DigitalClock } from '@/components/radio/digital-clock'
 import { PresetButtons, PRESETS_PER_BANK } from '@/components/radio/preset-buttons'
 import { RadioDisplay } from '@/components/radio/radio-display'
-import { RotaryKnob } from '@/components/radio/rotary-knob'
+import { StationLogo } from '@/components/radio/station-logo'
 import { useRadioPlayer } from '@/hooks/use-radio-player'
 import { useStreamTitle } from '@/hooks/use-stream-title'
 import { applyDisplayColor, DEFAULT_COLOR_ID, findDisplayColor } from '@/lib/display-colors'
@@ -18,7 +18,6 @@ const STORAGE_KEY = 'car-radio-classic:v1'
 const MIN_PRESET_BANKS = 2
 const TUNE_SETTLE_MS = 450
 const FLASH_MS = 1600
-const VOLUME_STEPS = 40
 
 type SavedState = {
   stations: Station[]
@@ -136,11 +135,6 @@ export function CarRadio() {
     setIsOn((on) => !on)
   }, [stations.length, showFlash])
 
-  function changeVolume(next: number) {
-    setVolume(next)
-    showFlash(`VOL ${Math.round(next * VOLUME_STEPS)}`)
-  }
-
   function selectPreset(presetIndex: number) {
     const stationId = presetIds[presetIndex]
     const index = stationId ? stations.findIndex((station) => station.id === stationId) : -1
@@ -237,14 +231,7 @@ export function CarRadio() {
 
         <div className="grid grid-cols-2 items-center gap-5 md:grid-cols-[auto_minmax(0,1fr)_auto] md:gap-8 short:grid-cols-[auto_minmax(0,1fr)_auto] short:gap-3">
           <div className="flex flex-col items-center gap-4 short:gap-2">
-            <RotaryKnob
-              mode="continuous"
-              label="Volume"
-              ariaLabel="Głośność"
-              valueText={`Głośność ${Math.round(volume * VOLUME_STEPS)} z ${VOLUME_STEPS}`}
-              value={volume}
-              onChange={changeVolume}
-            />
+            <StationLogo name={currentStation?.name ?? null} logo={currentStation?.logo} isOn={isOn} />
             <button
               type="button"
               onClick={togglePower}
