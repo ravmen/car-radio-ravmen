@@ -135,17 +135,33 @@ export function PresetButtons({
                     isActive ? 'bg-primary shadow-[0_0_10px_var(--primary)]' : 'bg-background/80',
                   )}
                 />
-                <span
-                  className={cn(
-                    'text-4xl font-bold leading-none tabular-nums sm:text-5xl short:text-3xl',
-                    isActive ? 'text-primary' : 'text-foreground',
-                  )}
-                >
-                  {presetIndex + 1}
-                </span>
-                <span className="w-full truncate text-center text-xs font-medium uppercase tracking-wider text-muted-foreground sm:text-sm short:hidden">
-                  {station?.name ?? '— — —'}
-                </span>
+                {station ? (
+                  <>
+                    <span
+                      aria-hidden="true"
+                      className="absolute left-2 top-1.5 font-mono text-xs font-semibold tabular-nums text-muted-foreground short:text-[10px]"
+                    >
+                      {presetIndex + 1}
+                    </span>
+                    <span
+                      className={cn(
+                        'line-clamp-2 w-full break-words text-center text-base font-bold uppercase leading-tight tracking-wide sm:text-lg short:text-sm',
+                        isActive ? 'text-primary' : 'text-foreground',
+                      )}
+                    >
+                      {station.name}
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <span className="text-4xl font-bold leading-none tabular-nums text-muted-foreground sm:text-5xl short:text-3xl">
+                      {presetIndex + 1}
+                    </span>
+                    <span className="w-full truncate text-center text-xs font-medium uppercase tracking-wider text-muted-foreground sm:text-sm short:hidden">
+                      {'— — —'}
+                    </span>
+                  </>
+                )}
               </button>
             )
           })}
