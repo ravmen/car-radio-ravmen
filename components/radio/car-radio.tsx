@@ -3,16 +3,18 @@
 import { ChevronsLeft, ChevronsRight, Power } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { PlaylistLoader } from '@/components/radio/playlist-loader'
-import { PresetButtons } from '@/components/radio/preset-buttons'
+import { ColorPicker } from '@/components/radio/color-picker'
+import { PresetButtons, PRESETS_PER_BANK } from '@/components/radio/preset-buttons'
 import { RadioDisplay } from '@/components/radio/radio-display'
 import { RotaryKnob } from '@/components/radio/rotary-knob'
 import { useRadioPlayer } from '@/hooks/use-radio-player'
 import { useStreamTitle } from '@/hooks/use-stream-title'
+import { applyDisplayColor, DEFAULT_COLOR_ID, findDisplayColor } from '@/lib/display-colors'
 import { parseM3U, stationFrequency, type Station } from '@/lib/m3u'
 import { cn } from '@/lib/utils'
 
 const STORAGE_KEY = 'car-radio-classic:v1'
-const PRESET_COUNT = 6
+const MIN_PRESET_BANKS = 2
 const TUNE_SETTLE_MS = 450
 const FLASH_MS = 1600
 const VOLUME_STEPS = 40
@@ -22,9 +24,20 @@ type SavedState = {
   presetIds: (string | null)[]
   currentId: string | null
   volume: number
+  colorId: string
 }
 
-const emptyPresets = (): (string | null)[] => Array.from({ length: PRESET_COUNT }, () => null)
+function presetSlotCount(stationCount: number) {
+  const banks = Math.max(MIN_PRESET_BANKS, Math.ceil(stationCount / PRESETS_PER_BANK))
+  return banks * PRESETS_PER_BANK
+}
+
+function buildPresets(source: (string | null)[], stationCount: number) {
+  const length = Math.max(presetSlotCount(stationCount), Math.ceil(source.length / PRESETS_PER_BANK) * PRESETS_PER_BANK)
+  return Array.from({ length }, (_, index) => source[index] ?? null)
+}
+
+const emptyPresets = (): (string | null)[] => buildPresets([], 0)
 
 function stationsLabel(count: number) {
   if (count === 1) return 'STACJĘ'
@@ -42,6 +55,8 @@ export function CarRadio() {
   const [volume, setVolume] = useState(0.6)
   const [flash, setFlash] = useState<string | null>(null)
   const [isHydrated, setIsHydrated] = useState(false)
+  const [colorId, setColorId] = useState(DEFAULT_COLOR_ID)
+  const [presetBank, setPresetBank] = useState(0)
   const flashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const settleDelayRef = useRef(0)
 
@@ -64,10 +79,11 @@ export function CarRadio() {
         if (Array.isArray(saved.stations) && saved.stations.length > 0) {
           setStations(saved.stations)
           const savedPresets = Array.isArray(saved.presetIds) ? saved.presetIds : []
-          setPresetIds(Array.from({ length: PRESET_COUNT }, (_, index) => savedPresets[index] ?? null))
+          setPresetIds(buildPresets(savedPresets, saved.stations.length))
           setCurrentIndex(Math.max(0, saved.stations.findIndex((station) => station.id === saved.currentId)))
         }
         if (typeof saved.volume === 'number') setVolume(Math.min(1, Math.max(0, saved.volume)))
+        if (typeof saved.colorId === 'string') setColorId(findDisplayColor(saved.colorId).id)
       }
     } catch {
       localStorage.removeItem(STORAGE_KEY)
@@ -77,9 +93,18 @@ export function CarRadio() {
 
   useEffect(() => {
     if (!isHydrated) return
-    const state: SavedState = { stations, presetIds, currentId: currentStation?.id ?? null, volume }
+    const state: SavedState = { stations, presetIds, currentId: currentStation?.id ?? null, volume, colorId }
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
-  }, [isHydrated, stations, presetIds, currentStation?.id, volume])
+  }, [isHydrated, stations, presetIds, currentStation?.id, volume, colorId])
+
+  useEffect(() => {
+    applyDisplayColor(findDisplayColor(colorId))
+  }, [colorId])
+
+  function changeColor(nextColorId: string) {
+    setColorId(nextColorId)
+    showFlash(`KOLOR: ${findDisplayColor(nextColorId).label.toUpperCase()}`)
+  }
 
   useEffect(() => {
     if (!isOn || !currentUrl) {
@@ -140,7 +165,8 @@ export function CarRadio() {
       return
     }
     setStations(parsed)
-    setPresetIds(Array.from({ length: PRESET_COUNT }, (_, index) => parsed[index]?.id ?? null))
+    setPresetIds(buildPresets(parsed.map((station) => station.id), parsed.length))
+    setPresetBank(0)
     settleDelayRef.current = 0
     setCurrentIndex(0)
     setIsOn(true)
@@ -181,6 +207,10 @@ export function CarRadio() {
     [presetIds, stations],
   )
   const activePresetIndex = currentStation ? presetIds.indexOf(currentStation.id) : -1
+
+  useEffect(() => {
+    if (activePresetIndex >= 0) setPresetBank(Math.floor(activePresetIndex / PRESETS_PER_BANK))
+  }, [activePresetIndex])
 
   const rdsText = (() => {
     if (flash) return flash
@@ -278,6 +308,8 @@ export function CarRadio() {
 
         <PresetButtons
           presets={presetStations}
+          bank={presetBank}
+          onBankChange={setPresetBank}
           activePresetIndex={activePresetIndex >= 0 ? activePresetIndex : null}
           onSelect={selectPreset}
           onStore={storePreset}
@@ -285,7 +317,10 @@ export function CarRadio() {
         />
       </section>
 
-      <PlaylistLoader onLoad={loadPlaylist} />
+      <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-1">
+        <ColorPicker value={colorId} onChange={changeColor} />
+        <PlaylistLoader onLoad={loadPlaylist} />
+      </div>
     </div>
   )
 }
