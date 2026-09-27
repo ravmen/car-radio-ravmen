@@ -4,6 +4,7 @@ import { ChevronsLeft, ChevronsRight, Power } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { PlaylistLoader } from '@/components/radio/playlist-loader'
 import { ColorPicker } from '@/components/radio/color-picker'
+import { DigitalClock } from '@/components/radio/digital-clock'
 import { PresetButtons, PRESETS_PER_BANK } from '@/components/radio/preset-buttons'
 import { RadioDisplay } from '@/components/radio/radio-display'
 import { RotaryKnob } from '@/components/radio/rotary-knob'
@@ -275,14 +276,7 @@ export function CarRadio() {
           />
 
           <div className="flex flex-col items-center gap-4 short:gap-2">
-            <RotaryKnob
-              mode="stepped"
-              label="Tune"
-              ariaLabel="Strojenie stacji"
-              valueText={currentStation ? `${currentStation.name}, stacja ${currentIndex + 1} z ${stations.length}` : 'Brak stacji'}
-              onStep={tune}
-              disabled={!hasStations}
-            />
+            <DigitalClock />
             <div className="flex w-full max-w-40 gap-3">
               <button
                 type="button"
