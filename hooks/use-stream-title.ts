@@ -10,8 +10,12 @@ const fetcher = async (url: string): Promise<StreamMetadata> => {
   return response.json()
 }
 
+// The APK build is a static export without API routes, so it sets this to an empty string to disable RDS lookups.
+const METADATA_ENDPOINT = process.env.NEXT_PUBLIC_METADATA_ENDPOINT ?? '/api/metadata'
+
 export function useStreamTitle(streamUrl: string | null) {
-  const { data } = useSWR(streamUrl ? `/api/metadata?url=${encodeURIComponent(streamUrl)}` : null, fetcher, {
+  const key = streamUrl && METADATA_ENDPOINT ? `${METADATA_ENDPOINT}?url=${encodeURIComponent(streamUrl)}` : null
+  const { data } = useSWR(key, fetcher, {
     refreshInterval: 20000,
     revalidateOnFocus: false,
     keepPreviousData: false,

@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
+const isAndroidBuild = process.env.BUILD_TARGET === 'android'
+
 const nextConfig = {
+  ...(isAndroidBuild ? { output: 'export', trailingSlash: true } : {}),
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -7,6 +10,7 @@ const nextConfig = {
     unoptimized: true,
   },
   async headers() {
+    if (isAndroidBuild) return []
     return [
       {
         source: '/:path*',

@@ -1,0 +1,13 @@
+{
+  "appId": "pl.carradio.classic",
+  "appName": "Car Radio Classic",
+  "webDir": "out",
+  "server": {
+    "androidScheme": "https",
+    "cleartext": true
+  },
+  "android": {
+    "allowMixedContent": true,
+    "backgroundColor": "#0b0d10"
+  }
+}
