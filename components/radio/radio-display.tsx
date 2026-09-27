@@ -1,5 +1,6 @@
 import type { PlayerStatus } from '@/hooks/use-radio-player'
 import { cn } from '@/lib/utils'
+import { MarqueeText } from '@/components/radio/marquee-text'
 
 type RadioDisplayProps = {
   frequency: string | null
@@ -22,26 +23,6 @@ const STATUS_LABELS: Record<PlayerStatus, string> = {
 
 function Indicator({ active, children }: { active: boolean; children: React.ReactNode }) {
   return <span className={cn('transition-colors', active ? 'lcd-glow' : 'text-lcd-dim')}>{children}</span>
-}
-
-function RdsMarquee({ text }: { text: string }) {
-  const shouldScroll = text.length > 30
-  if (!shouldScroll) {
-    return <p className="lcd-glow truncate">{text}</p>
-  }
-  const duration = Math.max(10, text.length * 0.35)
-  return (
-    <div className="overflow-hidden" aria-label={text}>
-      <div
-        aria-hidden="true"
-        className="marquee-track flex w-max whitespace-nowrap"
-        style={{ '--marquee-duration': `${duration}s` } as React.CSSProperties}
-      >
-        <span className="lcd-glow pr-16">{text}</span>
-        <span className="lcd-glow pr-16">{text}</span>
-      </div>
-    </div>
-  )
 }
 
 export function RadioDisplay({
@@ -91,17 +72,17 @@ export function RadioDisplay({
         <span className={cn('text-xl sm:text-2xl short:text-lg', frequency ? 'lcd-glow' : 'text-lcd-dim')}>MHz</span>
       </div>
 
-      <p
+      <MarqueeText
+        text={stationName ?? 'BRAK STACJI'}
+        pixelsPerSecond={90}
         className={cn(
-          'truncate text-5xl uppercase leading-tight sm:text-6xl lg:text-7xl short:text-4xl',
+          'text-5xl uppercase leading-tight sm:text-6xl lg:text-7xl short:text-4xl',
           stationName ? 'lcd-glow' : 'text-lcd-dim',
         )}
-      >
-        {stationName ?? 'BRAK STACJI'}
-      </p>
+      />
 
       <div className="border-t border-primary/15 pt-3 text-lg sm:text-xl short:pt-1 short:text-base">
-        <RdsMarquee text={rdsText} />
+        <MarqueeText text={rdsText} pixelsPerSecond={50} className="lcd-glow" />
       </div>
     </div>
   )
