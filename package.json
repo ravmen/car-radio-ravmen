@@ -27,12 +27,18 @@
   },
   "devDependencies": {
     "@capacitor/cli": "^7.6.9",
+    "@csstools/postcss-cascade-layers": "^6.0.1",
     "@tailwindcss/postcss": "^4.3.3",
     "@types/node": "^24",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "lightningcss": "^1.33.0",
     "postcss": "^8.5",
     "tailwindcss": "^4.3.3",
     "typescript": "5.7.3"
-  }
+  },
+  "browserslist": [
+    "chrome >= 61",
+    "android >= 61"
+  ]
 }

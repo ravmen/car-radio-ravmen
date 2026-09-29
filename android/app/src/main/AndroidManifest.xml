@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Capacitor 7 declares minSdk 23; allow installing on API 21-22 head units -->
+    <uses-sdk tools:overrideLibrary="com.getcapacitor.android,capacitor.cordova.android.plugins,org.apache.cordova" />
 
     <application
         android:allowBackup="true"
