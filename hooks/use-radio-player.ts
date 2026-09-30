@@ -82,7 +82,7 @@ export function useRadioPlayer(volume: number) {
     if (needsHlsJs) {
       const { default: HlsClass } = await import('hls.js')
       if (HlsClass.isSupported()) {
-        const hls = new HlsClass({ lowLatencyMode: false })
+        const hls = new HlsClass({ lowLatencyMode: false, enableWorker: false })
         hlsRef.current = hls
         await withTimeout(
           new Promise<void>((resolve, reject) => {

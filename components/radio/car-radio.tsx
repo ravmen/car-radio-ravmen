@@ -229,8 +229,8 @@ export function CarRadio() {
           <span>FM · RDS · M3U</span>
         </header>
 
-        <div className="grid grid-cols-2 items-center gap-5 md:grid-cols-[auto_minmax(0,1fr)_auto] md:gap-8 short:grid-cols-[auto_minmax(0,1fr)_auto] short:gap-3">
-          <div className="flex flex-col items-center gap-4 short:gap-2">
+        <div className="flex flex-wrap items-center md:flex-nowrap short:flex-nowrap">
+          <div className="flex w-1/2 flex-col items-center gap-4 md:w-auto md:shrink-0 short:w-auto short:shrink-0 short:gap-2">
             <StationLogo name={currentStation?.name ?? null} logo={currentStation?.logo} isOn={isOn} />
             <button
               type="button"
@@ -251,7 +251,7 @@ export function CarRadio() {
           </div>
 
           <RadioDisplay
-            className="order-first col-span-2 md:order-none md:col-span-1 short:order-none short:col-span-1"
+            className="order-first mb-5 w-full md:order-none md:mx-8 md:mb-0 md:w-auto md:min-w-0 md:flex-1 short:order-none short:mx-3 short:mb-0 short:w-auto short:min-w-0 short:flex-1"
             frequency={currentStation ? stationFrequency(currentIndex, stations.length) : null}
             stationName={currentStation?.name ?? null}
             rdsText={rdsText}
@@ -262,7 +262,7 @@ export function CarRadio() {
             isOn={isOn}
           />
 
-          <div className="flex flex-col items-center gap-4 short:gap-2">
+          <div className="flex w-1/2 flex-col items-center gap-4 md:w-auto md:shrink-0 short:w-auto short:shrink-0 short:gap-2">
             <DigitalClock />
             <div className="flex w-full max-w-40 gap-3">
               <button
